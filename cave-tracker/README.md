@@ -1,19 +1,37 @@
+# cave-tracker
 
-### Development mode
+A [reagent](https://github.com/reagent-project/reagent) application designed to ... well, that part is up to you.
 
-To start the Figwheel compiler, navigate to the project folder and run the following command in the terminal:
+## Development Mode
+
+### Compile css:
+
+Compile css file once.
 
 ```
-lein figwheel
+lein less once
 ```
 
-Figwheel will automatically push cljs changes to the browser.
-Once Figwheel starts up, you should be able to open the `public/index.html` page in the browser.
+Automatically recompile css file on change.
 
+```
+lein less auto
+```
 
-### Building for production
+### Run application:
 
 ```
 lein clean
-lein package
+lein figwheel dev
+```
+
+Figwheel will automatically push cljs changes to the browser.
+
+Wait a bit, then browse to [http://localhost:3449](http://localhost:3449).
+
+## Production Build
+
+```
+lein clean
+lein cljsbuild once min
 ```

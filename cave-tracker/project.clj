@@ -1,64 +1,56 @@
 (defproject cave-tracker "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.946"]
-                 [reagent "0.7.0"]]
+                 [org.clojure/clojurescript "1.9.229"]
+                 [reagent "0.6.1"]
+                 [secretary "1.2.3"]
+                 [matchbox "0.0.10-SNAPSHOT"]
+                 [re-frisk "0.3.1"]]
 
-  :plugins [[lein-cljsbuild "1.1.5"]
-            [lein-figwheel "0.5.14"]
-            [lein-less "1.7.5"] ;; Less CSS
-            [lein-pdo "0.1.1"] ;; PDO - Parallel tasks
-            ]
+  :min-lein-version "2.5.3"
 
-  :min-lein-version "2.5.0"
+  :source-paths ["src/clj"]
 
-  :clean-targets ^{:protect false}
-  [:target-path
-   [:cljsbuild :builds :app :compiler :output-dir]
-   [:cljsbuild :builds :app :compiler :output-to]]
+  :plugins [[lein-cljsbuild "1.1.4"]
+            [lein-less "1.7.5"]
+            [lein-pdo "0.1.1"]]
 
-  :less {:source-paths ["src/less"] ;; Less css directory
-         :target-path "public/css"}
+  :clean-targets ^{:protect false} ["resources/public/js"
+                                    "target"]
 
-  :hooks [leiningen.less] ;; Hook less-css into leiningen
+  :figwheel {:css-dirs ["resources/public/css"]}
 
-  :resource-paths ["public"]
 
-  :figwheel {:http-server-root "."
-             :nrepl-port 7002
-             :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
-             :css-dirs ["public/css"]}
+  :less {:source-paths ["less"]
+         :target-path  "resources/public/css"}
 
-  :cljsbuild {:builds {:app
-                       {:source-paths ["src" "env/dev/cljs"]
-                        :compiler
-                        {:main "cave-tracker.dev"
-                         :output-to "public/js/app.js"
-                         :output-dir "public/js/out"
-                         :asset-path   "js/out"
-                         :source-map true
-                         :optimizations :none
-                         :pretty-print  true}
-                        :figwheel
-                        {:on-jsload "cave-tracker.core/mount-root"
-                         :open-urls ["http://localhost:3449/index.html"]}}
-                       :release
-                       {:source-paths ["src" "env/prod/cljs"]
-                        :compiler
-                        {:output-to "public/js/app.js"
-                         :output-dir "public/js/release"
-                         :asset-path   "js/out"
-                         :optimizations :advanced
-                         :pretty-print false}}}}
+    :profiles
+  {:dev
+   {:dependencies []
 
-  :aliases {"package" ["do" "clean" ["cljsbuild" "once" "release"]]
-            "run" ["pdo" "clean," "figwheel" ["less" "auto"]]}
+    :plugins      [[lein-figwheel "0.5.10"]]
+    }}
 
-  :profiles {:dev {:dependencies [[binaryage/devtools "0.9.7"]
-                                  [figwheel-sidecar "0.5.14"]
-                                  [org.clojure/tools.nrepl "0.2.13"]
-                                  [com.cemerick/piggieback "0.2.2"]]}})
+  :cljsbuild
+  {:builds
+   [{:id           "dev"
+     :source-paths ["src/cljs"]
+     :figwheel     {:on-jsload "cave-tracker.core/reload"}
+     :compiler     {:main                 cave-tracker.core
+                    :optimizations        :none
+                    :output-to            "resources/public/js/app.js"
+                    :output-dir           "resources/public/js/dev"
+                    :asset-path           "js/dev"
+                    :source-map-timestamp true}}
+
+    {:id           "min"
+     :source-paths ["src/cljs"]
+     :compiler     {:main            cave-tracker.core
+                    :optimizations   :advanced
+                    :output-to       "resources/public/js/app.js"
+                    :output-dir      "resources/public/js/min"
+                    :elide-asserts   true
+                    :closure-defines {goog.DEBUG false}
+                    :pretty-print    false}}
+
+    ]}
+  :aliases {"run" ["pdo" "clean," "figwheel" ["less" "auto"]]})
