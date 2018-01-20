@@ -15,10 +15,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Vars
 
-(def root (m/connect "https://cavetracker-28865.firebaseio.com/"))
+(def root
+  (m/connect "https://cavetracker-28865.firebaseio.com/"))
+
 (m/auth-anon root)
-
-
 
 (defonce app-state
   (r/sync-rw root))
@@ -43,6 +43,9 @@
   (defroute "/about" []
     (m/swap! root assoc :page :about))
 
+  (defroute "/account" []
+    (m/swap! root assoc :page :account))
+
   ;; add routes here
 
 
@@ -57,7 +60,7 @@
   (let [count (:count @ratom)]
     [:div [:h1 "Home Page"]
      [:a {:href "#/about"} "about page"]
-
+     [:a {:href "#/account"} "account page"]
      [:p "Count: " count]
      [:div
       [:button
@@ -70,6 +73,9 @@
 (defn about [ratom]
   [:div [:h1 "About Page"]
    [:a {:href "#/"} "home page"]])
+
+(defn account [ratom]
+  [:div [:h1 "Account Page"]])
 
 
 
